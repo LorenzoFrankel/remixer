@@ -1,10 +1,12 @@
 # Content Remixer
 
-A web application that uses Claude AI to rewrite text in different styles.
+A web application that uses Claude AI to reformat text into tweet-ready content.
 
 ## Features
 
-- Rewrite text in formal, casual, or funny styles
+- Transform any text into tweet-friendly format
+- Character count validation for Twitter limits
+- Maintains  mention compatibility
 - Real-time text transformation using Claude AI
 - Modern React UI with Tailwind CSS
 

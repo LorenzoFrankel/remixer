@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { Anthropic } from '@anthropic-ai/sdk';
 import dotenv from 'dotenv';
+import { systemPrompt } from './src/config/prompts';
 
 dotenv.config();
 
@@ -15,28 +16,49 @@ const anthropic = new Anthropic({
 app.use(cors());
 app.use(express.json());
 
-app.post('/api/remix', async (req: express.Request<{}, any, {text: string, style: string}>, res: express.Response, next: express.NextFunction): Promise<void> => {
-  const { text, style } = req.body;
+app.post('/api/remix', async (req, res) => {
+  const { text, format } = req.body;
+  console.log('Received request:', { format, textLength: text.length });
 
   try {
     const message = await anthropic.messages.create({
       model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1024,
-      temperature: 0.7,
-      system: "You are a helpful writing assistant that rewrites text in different styles.",
+      temperature: 0.3,
+      system: systemPrompt,
       messages: [{
         role: 'user',
         content: [{
           type: 'text',
-          text: `Rewrite the following text in a ${style} style: ${text}`
+          text: `Convert this text into a ${format} format:
+
+${text}
+
+Remember to maintain the original meaning while optimizing for the ${format} format.`
         }]
       }]
     });
 
     const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
-    res.json({ result: responseText });
+    console.log('Claude response:', responseText);
+    
+    let options = responseText
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+    console.log('Initial split:', options);
+
+    options = options
+      .map(line => line.replace(/^\d+\.\s*/, ''))
+      .map(line => line.replace(/^\s*[-•]\s*/, ''))
+      .map(line => line.trim())
+      .filter(line => line.length > 0)
+      .slice(0, 6);
+    console.log('Final options:', options);
+
+    res.json({ results: options });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Detailed error:', error);
     res.status(500).json({ message: 'Error processing request' });
   }
 });
