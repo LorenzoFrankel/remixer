@@ -14,11 +14,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const message = await anthropic.messages.create({
-      model: 'claude-3-sonnet-20240229',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1024,
+      temperature: 0.7,
+      system: "You are a helpful writing assistant that rewrites text in different styles.",
       messages: [{
         role: 'user',
-        content: `Rewrite the following text in a ${style} style: ${text}`
+        content: [{
+          type: 'text',
+          text: `Rewrite the following text in a ${style} style: ${text}`
+        }]
       }]
     });
 

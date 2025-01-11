@@ -1,4 +1,4 @@
-import Remixer from './components/Remixer'
+import { Remixer } from './components/Remixer'
 
 function App() {
   return (

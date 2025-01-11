@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function Remixer() {
+export function Remixer() {
   const [inputText, setInputText] = useState('')
   const [outputText, setOutputText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -61,5 +61,3 @@ function Remixer() {
     </div>
   )
 }
-
-export default Remixer
