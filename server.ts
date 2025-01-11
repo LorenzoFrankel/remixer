@@ -15,7 +15,7 @@ const anthropic = new Anthropic({
 app.use(cors());
 app.use(express.json());
 
-app.post('/api/remix', async (req, res) => {
+app.post('/api/remix', async (req: express.Request<{}, any, {text: string, style: string}>, res: express.Response, next: express.NextFunction): Promise<void> => {
   const { text, style } = req.body;
 
   try {
@@ -34,10 +34,10 @@ app.post('/api/remix', async (req, res) => {
     });
 
     const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
-    return res.json({ result: responseText });
+    res.json({ result: responseText });
   } catch (error) {
     console.error('Error:', error);
-    return res.status(500).json({ message: 'Error processing request' });
+    res.status(500).json({ message: 'Error processing request' });
   }
 });
 
