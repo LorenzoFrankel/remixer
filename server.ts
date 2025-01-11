@@ -1,15 +1,21 @@
+import express from 'express';
+import cors from 'cors';
 import { Anthropic } from '@anthropic-ai/sdk';
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const app = express();
+const port = 3000;
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
+app.use(cors());
+app.use(express.json());
 
+app.post('/api/remix', async (req, res) => {
   const { text, style } = req.body;
 
   try {
@@ -27,10 +33,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }]
     });
 
-    const responseText = message.content.find(c => c.type === 'text')?.text ?? '';
-    return res.status(200).json({ result: responseText });
+    const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
+    return res.json({ result: responseText });
   } catch (error) {
     console.error('Error:', error);
     return res.status(500).json({ message: 'Error processing request' });
   }
-}
+});
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+}); 
